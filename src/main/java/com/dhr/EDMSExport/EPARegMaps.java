@@ -27,7 +27,7 @@ public final class EPARegMaps {
 
 	// static initializer
 	static {
-		System.out.println("EPA Maps - static initializer called");
+		//System.out.println("EPA Maps - static initializer called");
 
 		EPASourceMap.put("Site Closure Documents/EPA", "SE");
 		EPASourceMap.put("Site Closure Documents/Licensee", "SL");

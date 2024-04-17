@@ -123,7 +123,7 @@ public class App {
 		idfSession = sessMgr.getSession(args3);
 
 		if (idfSession != null)
-			System.out.println("Session created successfully");
+			logger.info("DFC Session created successfully!");
 
 		return idfSession;
 	}
@@ -133,8 +133,8 @@ public class App {
 		IDfClient client = DfClient.getLocalClient();
 		IDfDocbaseMap docbaseMap = client.getDocbaseMap();
 		for (int i = 0; i < docbaseMap.getDocbaseCount(); i++) {
-			System.out.println("Docbase Name : " + docbaseMap.getDocbaseName(i));
-			System.out.println("Docbase Desc : " + docbaseMap.getDocbaseDescription(i));
+			logger.info("Docbase Name : " + docbaseMap.getDocbaseName(i));
+			logger.info("Docbase Desc : " + docbaseMap.getDocbaseDescription(i));
 		}
 	}
 
@@ -152,14 +152,14 @@ public class App {
 				+ ObjectID
 				+ "' and f.r_object_id = c.format and fs.r_object_id = c.storage_id and l.object_name = fs.root";
 
-		System.out.println(DMRQRY);
+		logger.debug(DMRQRY);
 
 		try {
 			IDfQuery query = new DfQuery();
 			query.setDQL(DMRQRY);
 			IDfCollection coll = query.execute(idfSession, 0);
 
-			System.out.println("Storage path");
+			logger.debug("Storage path");
 
 			while (coll.next()) {
 
@@ -176,16 +176,16 @@ public class App {
 					coll.close();
 
 				// System.out.println("Storage Ticket Object ID: " + r_object_id);
-				System.out.println("Storage Ticket Data Ticket ID: " + data_ticket);
+				logger.debug("Storage Ticket Data Ticket ID: " + data_ticket);
 
 				ticket = Long.parseLong(data_ticket);
 				long value = -2 ^ 32;
 				ticket += 4294967296l;
 
-				System.out.println("Big Ticket: : " + ticket);
+				logger.debug("Big Ticket: : " + ticket);
 				String resultHex = Long.toString(ticket, 16);
 
-				System.out.println("Big Ticket Hex: : " + resultHex);
+				logger.debug("Big Ticket Hex: : " + resultHex);
 
 				// Resultant Hex will be 8000099e
 				// 01234567
@@ -199,7 +199,7 @@ public class App {
 				String actualPath = String.format("%s\\%08x\\%2s\\%2s\\%2s\\%2s.pdf", file_system_path, docbaseId, p1,
 						p2, p3, p4);
 
-				System.out.println("Calculated Path: : " + actualPath);
+				logger.debug("Calculated Path: : " + actualPath);
 
 				sp.setDataTicket(ticket);
 				sp.setDocbaseID(r_docbase_id);
@@ -211,7 +211,7 @@ public class App {
 
 			}
 		} catch (Exception dfe) {
-			System.out.println("Error: " + dfe.getMessage());
+			logger.error("Error: " + dfe.getMessage());
 			// DfLogger.error(this, dfe.getMessage(), null, null);
 		}
 
@@ -274,12 +274,12 @@ public class App {
 
 			// DfLogger.info("this", "ObjectId", null, null);
 
-			System.out.println("Calling Storage Path calculation path");
+			logger.debug("Calling Storage Path calculation path");
 
 			StoragePath sp = GetStoragePath(ObjectID);
 
 			if (sp == null) {
-				System.out.println("SP Is null: " + ObjectID);
+				logger.debug("SP Is null: " + ObjectID);
 				sp = new StoragePath();
 				sp.setDocbaseID("666");
 				sp.setDataTicket(0L);
@@ -319,7 +319,7 @@ public class App {
 
 			for (int index = 0; index < count; index++) {
 
-				System.out.println("Label: " + labels.getVersionLabel(index));
+				logger.debug("Label: " + labels.getVersionLabel(index));
 
 				// Do your thing - system.out or whatever
 
@@ -327,16 +327,20 @@ public class App {
 
 			folder_path = obj.getString("r_folder_path");
 
-			RegInfo rt = this.getRegfromFolder(folder_path);
-
-			System.out.println("Object ID: " + r_object_id);
-			System.out.println("Folder ID: " + folder_r_object_id);
-			System.out.println("Folder Pathname: " + folder_path);
+			RegInfo rt = App.getRegfromFolder(folder_path);
 			
-			System.out.println("Object Name: " + object_name);
-			System.out.println("creation date: " + r_creation_date);
-			System.out.println("Doctype: " + epa_doctype);
-			System.out.println("Sub Doctype: " + epa_subtype);
+			// Get the source folder names from the folder path
+			String EPASource = App.getSourcefromFolder(folder_path);
+			String EPASourceCode = App.getSourcefromFolder(folder_path);
+
+			logger.debug("Object ID: " + r_object_id);
+			logger.debug("Folder ID: " + folder_r_object_id);
+			logger.debug("Folder Pathname: " + folder_path);
+			
+			logger.debug("Object Name: " + object_name);
+			logger.debug("creation date: " + r_creation_date);
+			logger.debug("Doctype: " + epa_doctype);
+			logger.debug("Sub Doctype: " + epa_subtype);
 
 			csvPrinter.printRecord(
 					r_object_id, 
@@ -351,7 +355,9 @@ public class App {
 					r_creation_date,
 					effective_date, 
 					r_version_label,
-					r_current_version, 
+					r_current_version,
+					EPASource,
+					EPASourceCode,
 					folder_path, 
 					sp.OriginalName, 
 					sp.StoragePath);
@@ -449,7 +455,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 1 - IPPC");
+			logger.debug("Found matching pattern 1 - IPPC");
 			rt.EPAType = "IPPC";
 			rt.RegNumber = matcher.group(0);
 			return rt;
@@ -460,7 +466,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 2 - Waste");
+			logger.debug("Found matching pattern 2 - Waste");
 			rt.EPAType = "Waste";
 			rt.RegNumber = matcher.group(0);
 			return rt;
@@ -471,7 +477,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 3 - APA");
+			logger.debug("Found matching pattern 3 - APA");
 			rt.EPAType = "APA";
 			rt.RegNumber = matcher.group(0);
 			return rt;
@@ -482,7 +488,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 4 - Article 11");
+			logger.debug("Found matching pattern 4 - Article 11");
 			String a11Number = matcher.group(0).substring(10, 14);
 			rt.EPAType = "Article 11";
 
@@ -495,7 +501,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 5 - Article 27");
+			logger.debug("Found matching pattern 5 - Article 27");
 
 			rt.EPAType = "Article 27";
 			rt.RegNumber = matcher.group(0);
@@ -508,7 +514,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 6 - Article 28");
+			logger.debug("Found matching pattern 6 - Article 28");
 
 			rt.EPAType = "Article 28";
 			rt.RegNumber = matcher.group(0);
@@ -520,7 +526,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 7 - COR");
+			logger.debug("Found matching pattern 7 - COR");
 
 			rt.EPAType = "COR";
 			rt.RegNumber = matcher.group(0);
@@ -533,7 +539,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 8 - DaS");
+			logger.debug("Found matching pattern 8 - DaS");
 			rt.EPAType = "DaS";
 			String reg = matcher.group(0).substring(1, 9);
 			rt.EPAType = "DaS";
@@ -546,7 +552,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 9 - ET");
+			logger.debug("Found matching pattern 9 - ET");
 			rt.EPAType = "Emissions Trading";
 			rt.RegNumber = matcher.group(0);
 			return rt;
@@ -557,7 +563,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 10 - EI");
+			logger.debug("Found matching pattern 10 - EI");
 			rt.EPAType = "Extractive Industries";
 			rt.RegNumber = matcher.group(0);
 			return rt;
@@ -568,7 +574,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 11 - GMO");
+			logger.debug("Found matching pattern 11 - GMO");
 			rt.EPAType = "GMO";
 			String reg = matcher.group(0).substring(1, 9);
 			rt.RegNumber = reg;
@@ -580,7 +586,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 12 - HL");
+			logger.debug("Found matching pattern 12 - HL");
 			rt.EPAType = "Historic Landfill";
 			String reg = matcher.group(0).substring(1, 9);
 			rt.RegNumber = reg;
@@ -592,7 +598,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 13 - HL");
+			logger.debug("Found matching pattern 13 - HL");
 			rt.EPAType = "VOC";
 			String reg = matcher.group(0).substring(1, 9);
 			rt.RegNumber = reg;
@@ -604,7 +610,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 14 - WWC");
+			logger.debug("Found matching pattern 14 - WWC");
 			rt.EPAType = "WWC";
 			String reg = matcher.group(0).substring(1, 9);
 			rt.RegNumber = reg;
@@ -617,7 +623,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 15 - WWD");
+			logger.debug("Found matching pattern 15 - WWD");
 			rt.EPAType = "WWD";
 			String reg = matcher.group(0).substring(1, 9);
 			rt.RegNumber = reg;
@@ -632,7 +638,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 16 - EU-BP");
+			logger.debug("Found matching pattern 16 - EU-BP");
 			rt.EPAType = "EU-BP";
 			String reg = matcher.group(0);
 			rt.RegNumber = reg;
@@ -644,7 +650,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 17 - EU-SOW");
+			logger.debug("Found matching pattern 17 - EU-SOW");
 			rt.EPAType = "EU-SoW";
 			String reg = matcher.group(0);
 			rt.RegNumber = reg;
@@ -656,7 +662,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 18 - N-BP");
+			logger.debug("Found matching pattern 18 - N-BP");
 			rt.EPAType = "N-BP";
 			String reg = matcher.group(0);
 			rt.RegNumber = reg;
@@ -668,7 +674,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 19 - N-SOW");
+			logger.debug("Found matching pattern 19 - N-SOW");
 			rt.EPAType = "N-SoW";
 			String reg = matcher.group(0);
 			rt.RegNumber = reg;
@@ -680,7 +686,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 20 - SC-BP");
+			logger.debug("Found matching pattern 20 - SC-BP");
 			rt.EPAType = "SC-BP";
 			String reg = matcher.group(0);
 			rt.RegNumber = reg;
@@ -692,7 +698,7 @@ public class App {
 		matcher = pattern.matcher(FolderName);
 
 		if (matcher.find()) {
-			logger.info("Found matching pattern 21 - SC-SOW");
+			logger.debug("Found matching pattern 21 - SC-SOW");
 			rt.EPAType = "SC-SoW";
 			String reg = matcher.group(0);
 			rt.RegNumber = reg;
