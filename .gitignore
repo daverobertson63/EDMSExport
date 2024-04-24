@@ -89,3 +89,11 @@ nb-configuration.xml
 ## Miscellaneous
 ##############################
 *.log
+##############################
+## Documentum / DFC
+##############################
+*.log
+documentum/
+logs/
+dfcout/
+

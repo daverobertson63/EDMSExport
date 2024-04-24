@@ -91,8 +91,10 @@ import com.documentum.xml.xdql.IDfXmlQuery;
 
 import jdk.internal.org.jline.utils.Log;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 
 public class App {
 
@@ -123,7 +125,7 @@ public class App {
 		idfSession = sessMgr.getSession(args3);
 
 		if (idfSession != null)
-			logger.info("DFC Session created successfully!");
+			logger.debug("DFC Session created successfully!");
 
 		return idfSession;
 	}
@@ -716,10 +718,16 @@ public class App {
 		String username = loadProps.getProperty("username");
 		String password = loadProps.getProperty("password");
 		String dfc_properties = loadProps.getProperty("dfc");
+		String query = loadProps.getProperty("query");
 
 		// Test cases
 		// String result = object.getRegfromFolder("Cabinets/Licence
 		// Applications/IPPC/P0001-01/Applicant");
+		
+		
+
+		// You can also set the root logger:
+		//Configurator.setRootLevel(Level.INFO);
 
 		System.setProperty("dfc.properties.file", dfc_properties);
 
@@ -727,7 +735,10 @@ public class App {
 
 		String Source = EPARegMaps.EPASourceMap.get("Site Closure Documents/EPA").toString();
 
-		logger.info("Sourtce Maps: " + Source);
+		logger.debug("Source Maps Test: " + Source);	
+		
+		logger.info("Loading Export - using the settings query: " + query);
+
 
 		// App object = new App(args[0], args[1], args[2]);
 
@@ -740,7 +751,10 @@ public class App {
 		} finally {
 			// to release a docbase session
 			object.releaseSession();
+			logger.info("Completed Export.. closing session");
 		}
+		
+		
 	}
 }
 
