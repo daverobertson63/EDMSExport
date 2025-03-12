@@ -97,3 +97,14 @@ documentum/
 logs/
 dfcout/
 
+/.apt_generated/
+/.apt_generated_tests/
+
+# Ignore All generated files like XLS and CSV
+*.xlsx
+*.xlsm
+*.xls
+*.csv
+
+settings.out.xml
+
