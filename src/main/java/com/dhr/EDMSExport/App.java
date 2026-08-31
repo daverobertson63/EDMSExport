@@ -719,7 +719,7 @@ public class App {
 		String password = loadProps.getProperty("password");
 		String dfc_properties = loadProps.getProperty("dfc");
 		String query = loadProps.getProperty("query");
-
+		String batch = loadProps.getProperty("batchfile");
 		// Test cases
 		// String result = object.getRegfromFolder("Cabinets/Licence
 		// Applications/IPPC/P0001-01/Applicant");
