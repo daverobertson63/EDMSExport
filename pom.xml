@@ -49,17 +49,7 @@
 			<scope>test</scope>
 		</dependency>
 
-
 		
-
-		
-				<dependency>
-			<groupId>com.documentum</groupId>
-  <artifactId>dfc</artifactId>
-  <version>23.4</version>
-			
-		</dependency>
-
 
 
 	</dependencies>
