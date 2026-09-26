@@ -89,7 +89,7 @@ import com.documentum.operations.IDfOperationError;
 import com.documentum.xml.xdql.DfXmlQuery;
 import com.documentum.xml.xdql.IDfXmlQuery;
 
-import jdk.internal.org.jline.utils.Log;
+//import jdk.internal.org.jline.utils.Log;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -228,6 +228,7 @@ public class App {
 		loadProps.loadFromXML(new FileInputStream("settings.xml"));
 
 		String DQLQuery = loadProps.getProperty("query");
+		String DQLType = loadProps.getProperty("type");
 		String header = loadProps.getProperty("header");
 		String exportFile = loadProps.getProperty("export");
 
@@ -242,18 +243,18 @@ public class App {
 		String r_object_id;
 		String folder_r_object_id;
 		String folder_path;
-		String reg_no;
+		String reg_no="";
 		String object_name;
 		String r_creation_date;
-		String epa_doctype;
-		String epa_subtype;
-		String effective_date;
-		String r_version_label;
+		String epa_doctype="";
+		String epa_subtype="";
+		String effective_date="";
+		String r_version_label="";
 		String r_current_version;
-		String epa_controlled;
-		String epa_publish_status;
-		String epa_isprivate;
-		String reg_number;
+		String epa_controlled="";
+		String epa_publish_status="";
+		String epa_isprivate="";
+		String reg_number="";
 
 		BufferedWriter writer = Files.newBufferedWriter(Paths.get(exportFile));
 
@@ -263,6 +264,8 @@ public class App {
 				.build();
 
 		CSVPrinter csvPrinter = new CSVPrinter(writer, csvFormat);
+		
+		boolean basicType = DQLType.equals("dm_document");
 
 		while (coll.next()) {
 
@@ -304,12 +307,16 @@ public class App {
 			r_object_id = typeObject.getString("r_object_id");
 			object_name = typeObject.getString("object_name");
 			r_creation_date = typeObject.getString("r_creation_date");
-			effective_date = typeObject.getString("effective_date");
-			epa_doctype = typeObject.getString("epa_doctype");
-			epa_subtype = typeObject.getString("epa_subtype");
-			epa_publish_status = typeObject.getString("epa_publish_status");
-			epa_controlled = typeObject.getString("epa_controlled");
-			epa_isprivate = typeObject.getString("isprivate");
+			if ( !basicType) {
+				
+				effective_date = typeObject.getString("effective_date");
+				epa_doctype = typeObject.getString("epa_doctype");
+				epa_subtype = typeObject.getString("epa_subtype");
+				epa_publish_status = typeObject.getString("epa_publish_status");
+				epa_controlled = typeObject.getString("epa_controlled");
+				epa_isprivate = typeObject.getString("isprivate");
+			
+			}
 
 			IDfVersionLabels labels = objRoot.getVersionLabels();
 
@@ -331,6 +338,7 @@ public class App {
 
 			RegInfo rt = App.getRegfromFolder(folder_path);
 			
+			
 			// Get the source folder names from the folder path
 			String EPASource = App.getSourcefromFolder(folder_path);
 			String EPASourceCode = App.getSourcefromFolder(folder_path);
@@ -341,8 +349,10 @@ public class App {
 			
 			logger.debug("Object Name: " + object_name);
 			logger.debug("creation date: " + r_creation_date);
-			logger.debug("Doctype: " + epa_doctype);
-			logger.debug("Sub Doctype: " + epa_subtype);
+			if ( !basicType) {
+				logger.debug("Doctype: " + epa_doctype);
+				logger.debug("Sub Doctype: " + epa_subtype);
+			}
 
 			csvPrinter.printRecord(
 					r_object_id, 
