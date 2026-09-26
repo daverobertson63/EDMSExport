@@ -8,6 +8,8 @@
 *.war
 *.ear
 *.nar
+*.zip
+*.7z
 hs_err_pid*
 replay_pid*
 
